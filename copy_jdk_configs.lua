@@ -1,3 +1,4 @@
+#!/usr/bin/lua
 -- rpm call
 -- lua -- copy_jdk_configs.lua   --currentjvm "%{uniquesuffix %{nil}}" --jvmdir "%{_jvmdir %{nil}}" --origname "%{name}" --origjavaver "%{javaver}" --arch "%{_arch}" --debug true
 --test call
