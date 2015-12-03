@@ -33,7 +33,7 @@ for i=1,#arg,2 do
     print("    Migration/testing switch. Target Mostly same as jvmdir, but you may wont to copy ouside it.")
     print("  --debug")
     print("    Enables printing out whats going on. true/false")
-	System.exit(1)
+    os.exit(0)
   end
   if (arg[i] == "--currentjvm") then 
     currentjvm=arg[i+1]
