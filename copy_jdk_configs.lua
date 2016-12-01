@@ -104,6 +104,7 @@ local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/security/java.security",
               "jre/lib/security/local_policy.jar",
               "jre/lib/security/nss.cfg",
+              "jre/lib/security/cacerts",
               "jre/lib/ext"}
 
 function splitToTable(source, pattern)
