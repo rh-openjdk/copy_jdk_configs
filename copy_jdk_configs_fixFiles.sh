@@ -75,7 +75,7 @@ for file in $files ; do
    fi
   else
    debug "$sf2 was modified, keeping $file, and removing the duplicated original"
-   # information is now backuped, in new directory anyway. Removing future rpmsave to allow rep -e
+   # information is now backuped, in new directory anyway. Removing future rpmsave to allow rpm -e
    rm $sf2
    # or its corresponding backup
    rm $sf2.rpmnew
