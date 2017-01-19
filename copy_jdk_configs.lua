@@ -15,6 +15,7 @@ local origname = nil
 local origjavaver = nil
 local arch = nil
 local debug = false;
+local temp = nil;
 
 for i=1,#arg,2 do 
   if (arg[i] == "--help" or arg[i] == "-h") then 
@@ -33,6 +34,8 @@ for i=1,#arg,2 do
     print("    Migration/testing switch. Target Mostly same as jvmdir, but you may wont to copy ouside it.")
     print("  --debug")
     print("    Enables printing out whats going on. true/false")
+    print("  --temp")
+    print("    optional file to save intermediate result - directory configs were copied from")
     os.exit(0)
   end
   if (arg[i] == "--currentjvm") then 
@@ -58,6 +61,9 @@ for i=1,#arg,2 do
     if (arg[i+1] == "true") then
      debug = true
     end
+  end
+  if (arg[i] == "--temp") then 
+    temp=arg[i+1]
   end
 end
 
@@ -194,6 +200,16 @@ if (debug) then
 end
 
 latestjvm = jvms[#jvms]
+
+if ( temp ~= nil ) then
+  src=jvmdir.."/"..latestjvm
+  if (debug) then
+    print("temp declared as "..temp.." saving used dir of "..src)
+  end
+  file = io.open (temp, "w")
+  file:write(src)
+  file:close()
+end 
 
 
 for i,file in pairs(caredFiles) do
