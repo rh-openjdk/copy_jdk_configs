@@ -4,16 +4,21 @@ target=$2
 
 debug="false"
 
-#we should be pretty strict about removing once used (even "used" [with fail]) config file, as it may corrupt another installation
-clean(){
-  debug "cleanup: removing $config"
-  rm -rf $config
-}
+rma=""
+  if [ "x$debug" == "xtrue" ] ; then
+    rma="-v"
+  fi
 
 debug(){
   if [ "x$debug" == "xtrue" ] ; then
     echo "$1"
   fi
+}
+
+#we should be pretty strict about removing once used (even "used" [with fail]) config file, as it may corrupt another installation
+clean(){
+  debug "cleanup: removing $config"
+  rm -rf $config
 }
 
 if [ "x" == "x$config" ] ; then
@@ -54,32 +59,61 @@ if [ ! -d  "$source" ] ; then
 fi 
 
 debug "source: $source"
+debug "target: $target"
+
+work(){
+  if [ "X$1" == "Xrpmnew" -o "X$1" == "Xrpmorig" ] ; then
+    debug "Working with $1 (1)"
+  else
+    debug "unknown parameter: $1"
+    return 1
+  fi
+
+  local files=`find $target | grep "\\.$1$"`
+  for file in $files ; do
+    local sf1=`echo $file | sed "s/\\.$1$//"`
+    local sf2=`echo $sf1 | sed "s/$targetName/$srcName/"`
+    # was file modified in origianl installation?
+    rpm -Vf $source | grep -q $sf2
+    if [ $? -gt 0 ] ; then
+     if [ "X$1" == "Xrpmnew" ] ; then
+       debug "$sf2 was NOT modified, removing possibly corrupted $sf1 and renaming from $file"
+       rm $rma $sf1 
+       mv $rma $file $sf1
+       if [ $? -eq 0 ] ; then
+         echo "restored $file to $sf1"
+       else
+         echo "FAILED to restore $file to $sf1"
+       fi
+    fi
+     if [ "X$1" == "Xrpmorig" ] ; then
+       debug "$sf2 was NOT modified, removing possibly corrupted $file"
+       rm $rma $file
+    fi
+    else
+     debug "$sf2 was modified, keeping $file, and removing the duplicated original"
+     # information is now backuped, in new directory anyway. Removing future rpmsave to allow rpm -e
+     rm -f $rma $sf2
+     # or its corresponding backup
+     rm -f $rma $sf2.$1
+    fi
+done
+}
+
 
 srcName=`basename $source`
 targetName=`basename $target`
 
-files=`find $target | grep "\\.rpmnew$"`
-for file in $files ; do
-  sf1=`echo $file | sed "s/\\.rpmnew$//"`
-  sf2=`echo $sf1 | sed "s/$targetName/$srcName/"`
-  # was file modified in origianl installation?
-  rpm -Vf $source | grep -q $sf2
-  if [ $? -gt 0 ] ; then
-   debug "$sf2 was NOT modified, removing possibly corrupted $sf1 and renaming $file"
-   rm $sf1 
-   mv $file $sf1
-   if [ $? -eq 0 ] ; then
-     echo "restored $file to $sf1"
-   else
-     echo "FAILED to restore $file to $sf1"
-   fi
-  else
-   debug "$sf2 was modified, keeping $file, and removing the duplicated original"
-   # information is now backuped, in new directory anyway. Removing future rpmsave to allow rpm -e
-   rm $sf2
-   # or its corresponding backup
-   rm $sf2.rpmnew
-  fi
-done
+work rpmnew
+work rpmorig
 
+debug "Working with rpmorig (2)"
+# simply moving old rpmsaves to new dir
+# fix for config (replace) leftovers
+files=`find $source | grep "\\.rpmorig$"`
+  for file in $files ; do
+    rpmsaveTarget=`echo $file | sed "s/$srcName/$targetName/"`
+    debug "relocating $file to $rpmsaveTarget"
+    mv $rma $file $rpmsaveTarget
+  done
 clean
