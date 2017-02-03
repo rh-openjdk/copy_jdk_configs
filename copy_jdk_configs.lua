@@ -67,7 +67,7 @@ for i=1,#arg,2 do
   end
 end
 
-if (jvmDestdir == nill) then
+if (jvmDestdir == nil) then
 jvmDestdir = jvmdir
 end
 
