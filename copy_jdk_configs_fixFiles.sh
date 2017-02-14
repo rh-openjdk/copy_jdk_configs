@@ -104,6 +104,16 @@ done
 srcName=`basename $source`
 targetName=`basename $target`
 
+# idea: there should be check that the directory we are coping from is valid jre (eg jre/bin/java exists) and not leftower, otherwise following may happen:
+# <mvala> 1] install v1
+# <mvala> 2] edit java.security
+# <mvala> 3] remove v1
+# <mvala> 4] install v2
+# <mvala> 5] edit java.security
+# <mvala> 6] install v1
+# <mvala> 7] java.security is in original state instead of in state from step 5] (nor other "correct" as:
+# <mvala> mno ten java.security je ale uplne puvodni, neni ani ve stavu po prvnim editu ani po druhym. cekal bych ze se bud obnovi z rpmsave nebo se prevede z v2
+
 work rpmnew
 work rpmorig
 
