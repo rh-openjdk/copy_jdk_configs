@@ -114,6 +114,33 @@ files=`find $source | grep "\\.rpmorig$"`
   for file in $files ; do
     rpmsaveTarget=`echo $file | sed "s/$srcName/$targetName/"`
     debug "relocating $file to $rpmsaveTarget"
-    mv $rma $file $rpmsaveTarget
+    if [ -e $rpmsaveTarget ] ; then
+      rm $rma $file
+    else
+      mv $rma $file $rpmsaveTarget
+    fi
   done
+
+debug "Working with rpmsave (1)"
+files=`find $source | grep "\\.rpmsave$"`
+  for file in $files ; do
+    rpmsaveTarget=`echo $file | sed "s/$srcName/$targetName/"`
+    debug "relocating $file to $rpmsaveTarget"
+    if [ -e $rpmsaveTarget ] ; then
+      rm $rma $file
+    else
+      mv $rma $file $rpmsaveTarget
+    fi
+  done
+
+
+debug "cleaning legacy leftowers"
+if [ "x$debug" == "xtrue" ] ; then
+  find $source -empty -type d -delete
+  rmdir $rma $source
+else
+  find $source -empty -type d -delete 2>/dev/null >/dev/null
+  rmdir $rma $source 2>/dev/null >/dev/null
+fi
+
 clean
