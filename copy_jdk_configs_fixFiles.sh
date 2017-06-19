@@ -134,6 +134,19 @@ files=`find $source | grep "\\.rpmsave$"`
   done
 
 
+#warning: file /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.131-11.b12.el7.x86_64-debug/jre/lib/applet: remove failed: No such file or directory
+#warning: file /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.131-11.b12.el7.x86_64-debug/jre/lib/amd64/client: remove failed: No such file or directory
+#those dirs might be mepty by installtion, filling to not be rmeoved later
+blackdirs="$source/jre/lib/applet $source/jre/lib/*/client"
+for blackdir in $blackdirs; do
+  if [ -e $blackdir ] ; then
+    debug "nasty $blackdir  exists, filling"
+    touch $blackdir/C-J-C_placeholder
+  else
+    debug "nasty $blackdir  DONT exists, ignoring"
+  fi
+done
+
 debug "cleaning legacy leftowers"
 if [ "x$debug" == "xtrue" ] ; then
   find $source -empty -type d -delete
@@ -142,5 +155,15 @@ else
   find $source -empty -type d -delete 2>/dev/null >/dev/null
   rmdir $rma $source 2>/dev/null >/dev/null
 fi
+
+# and remove placeholders
+for blackdir in $blackdirs; do
+  if [ -e $blackdir ] ; then
+    debug "nasty $blackdir  exists, cleaning placeholder"
+    rm $blackdir/C-J-C_placeholder
+  else
+    debug "nasty $blackdir  DONT exists, ignoring again"
+  fi
+done
 
 clean

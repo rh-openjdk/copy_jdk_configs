@@ -183,7 +183,11 @@ for i,p in pairs(foundJvms) do
       end;
       return
     end ;
-    table.insert(jvms, p)
+    if (string.match(p, ".*-debug$")) then
+      print(p.." matched but seems to be debug variant. Skipping")
+    else
+      table.insert(jvms, p)
+    end
   else
     if (debug) then
       print("NOT matched:  "..p)
