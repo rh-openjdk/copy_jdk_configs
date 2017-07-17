@@ -4,98 +4,6 @@
 --test call
 --lua -- copy_jdk_configs.lua   --currentjvm "java-1.8.0-openjdk-1.8.0.65-3.b17.fc22.x86_64" --jvmdir "/usr/lib/jvm" --origname "java-1.8.0-openjdk" --origjavaver "1.8.0" --arch "x86_64" --debug true  --jvmDestdir /home/jvanek/Desktop
 
--- yum install lua-posix
-local posix = require "posix"
-
--- the one we are installing
-local currentjvm = nil
-local jvmdir = nil
-local jvmDestdir = nil
-local origname = nil
-local origjavaver = nil
-local arch = nil
-local debug = false;
-local temp = nil;
-
-for i=1,#arg,2 do 
-  if (arg[i] == "--help" or arg[i] == "-h") then 
-    print("all but jvmDestdir and debug are mandatory")
-    print("  --currentjvm")
-    print("    NVRA of currently installed java")
-    print("  --jvmdir") 
-    print("    Directory where to find this kind of virtual machine. Generally /usr/lib/jvm")
-    print("  --origname")
-    print("    convinient switch to determine jdk. Generally java-1.X.0-vendor")
-    print("  --origjavaver")
-    print("    convinient switch to determine jdk's version. Generally 1.X.0")
-    print("  --arch")
-    print("    convinient switch to determine jdk's arch")
-    print("  --jvmDestdir")
-    print("    Migration/testing switch. Target Mostly same as jvmdir, but you may wont to copy ouside it.")
-    print("  --debug")
-    print("    Enables printing out whats going on. true/false")
-    print("  --temp")
-    print("    optional file to save intermediate result - directory configs were copied from")
-    os.exit(0)
-  end
-  if (arg[i] == "--currentjvm") then 
-    currentjvm=arg[i+1]
-  end
-  if (arg[i] == "--jvmdir") then 
-    jvmdir=arg[i+1]
-  end
-  if (arg[i] == "--origname") then 
-    origname=arg[i+1]
-  end
-  if (arg[i] == "--origjavaver") then 
-    origjavaver=arg[i+1]
-  end
-  if (arg[i] == "--arch") then 
-    arch=arg[i+1]
-  end
-  if (arg[i] == "--jvmDestdir") then 
-    jvmDestdir=arg[i+1]
-  end
-  if (arg[i] == "--debug") then 
---no string, boolean, workaround
-    if (arg[i+1] == "true") then
-     debug = true
-    end
-  end
-  if (arg[i] == "--temp") then 
-    temp=arg[i+1]
-  end
-end
-
-if (jvmDestdir == nil) then
-jvmDestdir = jvmdir
-end
-
-
-if (debug) then
-  print("--currentjvm:");
-  print(currentjvm);
-  print("--jvmdir:");
-  print(jvmdir);
-  print("--jvmDestdir:");
-  print(jvmDestdir);
-  print("--origname:");
-  print(origname);
-  print("--origjavaver:");
-  print(origjavaver);
-  print("--arch:");
-  print(arch);
-  print("--debug:");
-  print(debug);
-end
-
-
---trasnform substitute names to lua patterns
-local name = string.gsub(string.gsub(origname, "%-", "%%-"), "%.", "%%.")
-local javaver = string.gsub(origjavaver, "%.", "%%.")
-
-local jvms = { }
-
 local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/content-types.properties",
               "jre/lib/flavormap.properties",
@@ -145,6 +53,118 @@ local caredFiles = {"jre/lib/calendars.properties",
               "conf/net.properties",
               "conf/sound.properties",
               "lib/ext"}
+
+-- before import to allow run from spec
+if (arg[1] == "--list") then 
+  for i,file in pairs(caredFiles) do
+    print(file)
+  end
+  return 0;
+end  
+
+-- yum install lua-posix
+local posix = require "posix"
+
+-- the one we are installing
+local currentjvm = nil
+local jvmdir = nil
+local jvmDestdir = nil
+local origname = nil
+local origjavaver = nil
+local arch = nil
+local debug = false;
+local temp = nil;
+local dry = false;
+
+for i=1,#arg,2 do 
+  if (arg[i] == "--help" or arg[i] == "-h") then 
+    print("all but jvmDestdir and debug are mandatory")
+    print("  --currentjvm")
+    print("    NVRA of currently installed java")
+    print("  --jvmdir") 
+    print("    Directory where to find this kind of virtual machine. Generally /usr/lib/jvm")
+    print("  --origname")
+    print("    convinient switch to determine jdk. Generally java-1.X.0-vendor")
+    print("  --origjavaver")
+    print("    convinient switch to determine jdk's version. Generally 1.X.0")
+    print("  --arch")
+    print("    convinient switch to determine jdk's arch")
+    print("  --jvmDestdir")
+    print("    Migration/testing switch. Target Mostly same as jvmdir, but you may wont to copy ouside it.")
+    print("  --debug")
+    print("    Enables printing out whats going on. true/false. False by default")
+    print("  --temp")
+    print("    optional file to save intermediate result - directory configs were copied from")
+    print("  --dry")
+    print("    true/fase if true, then no changes will be written to disk. False by default")
+    print("  **** specil parasm ****")
+    print("  --list")
+    print("    if present on cmdline, list all cared files and exists")
+    os.exit(0)
+  end
+  if (arg[i] == "--currentjvm") then 
+    currentjvm=arg[i+1]
+  end
+  if (arg[i] == "--jvmdir") then 
+    jvmdir=arg[i+1]
+  end
+  if (arg[i] == "--origname") then 
+    origname=arg[i+1]
+  end
+  if (arg[i] == "--origjavaver") then 
+    origjavaver=arg[i+1]
+  end
+  if (arg[i] == "--arch") then 
+    arch=arg[i+1]
+  end
+  if (arg[i] == "--jvmDestdir") then 
+    jvmDestdir=arg[i+1]
+  end
+  if (arg[i] == "--debug") then 
+--no string, boolean, workaround
+    if (arg[i+1] == "true") then
+     debug = true
+    end
+  end
+  if (arg[i] == "--dry") then 
+--no string, boolean, workaround
+    if (arg[i+1] == "true") then
+     dry = true
+    end
+  end
+  if (arg[i] == "--temp") then 
+    temp=arg[i+1]
+  end
+end
+
+if (jvmDestdir == nil) then
+jvmDestdir = jvmdir
+end
+
+
+if (debug) then
+  print("--currentjvm:");
+  print(currentjvm);
+  print("--jvmdir:");
+  print(jvmdir);
+  print("--jvmDestdir:");
+  print(jvmDestdir);
+  print("--origname:");
+  print(origname);
+  print("--origjavaver:");
+  print(origjavaver);
+  print("--arch:");
+  print(arch);
+  print("--debug:");
+  print(debug);
+end
+
+
+--trasnform substitute names to lua patterns
+local name = string.gsub(string.gsub(origname, "%-", "%%-"), "%.", "%%.")
+local javaver = string.gsub(origjavaver, "%.", "%%.")
+
+local jvms = { }
 
 function splitToTable(source, pattern)
   local i1 = string.gmatch(source, pattern) 
@@ -273,7 +293,9 @@ for i,file in pairs(caredFiles) do
       if (debug) then
         print(s.." does not exists, creating")
       end;
-      posix.mkdir(s)
+      if (not dry) then
+        posix.mkdir(s)
+      end
     else
       if (debug) then
         print(s.." exists,not creating")
@@ -285,7 +307,9 @@ for i,file in pairs(caredFiles) do
     if (debug) then
       print("executing "..exe)
     end;    
-    os.execute(exe)
+    if (not dry) then
+      os.execute(exe)
+    end
   else
     if (debug) then
       print(SOURCE.." does not exists")
