@@ -96,7 +96,7 @@ for i=1,#arg,2 do
     print("  --temp")
     print("    optional file to save intermediate result - directory configs were copied from")
     print("  --dry")
-    print("    true/fase if true, then no changes will be written to disk. False by default")
+    print("    true/fase if true, then no changes will be written to disk except one tmp file. False by default")
     print("  **** specil parasm ****")
     print("  --list")
     print("    if present on cmdline, list all cared files and exists")
@@ -174,6 +174,18 @@ function splitToTable(source, pattern)
   end
   return l1
 end
+
+local function slurp(path)
+    local f = io.open(path)
+    local s = f:read("*a")
+    f:close()
+    return s
+end
+
+function trim(s)
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 
 if (debug) then
   print("started")
@@ -269,6 +281,8 @@ if ( temp ~= nil ) then
 end 
 
 
+local readlinkOutput=os.tmpname()
+
 for i,file in pairs(caredFiles) do
   local SOURCE=jvmdir.."/"..latestjvm.."/"..file
   local DEST=jvmDestdir.."/"..currentjvm.."/"..file
@@ -304,6 +318,18 @@ for i,file in pairs(caredFiles) do
   end
 -- Copy with -a to keep everything intact
     local exe = "cp".." -ar "..SOURCE.." "..DEST
+    local linkExe = "readlink".." -f "..SOURCE.." > "..readlinkOutput
+    if (debug) then
+      print("executing "..linkExe)
+    end;
+    os.execute(linkExe)
+    local link=trim(slurp(readlinkOutput))
+    if (debug) then
+      print("  ...link is "..link)
+    end
+    if (not ((link) == (SOURCE))) then
+      print("WARNING link "..link.." where file "..SOURCE.."expected!")
+    end
     if (debug) then
       print("executing "..exe)
     end;    
