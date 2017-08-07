@@ -58,8 +58,27 @@ if [ ! -d  "$source" ] ; then
   exit 33
 fi 
 
-sourceLinks=`find $source -type l -print0 | xargs -0 ls -ld | sed "s;.* $source;$source;" | sed "s; \+;_;g"`
-targetLinks=`find $target -type l -print0 | xargs -0 ls -ld | sed "s;.* $target;$target;" | sed "s; \+;_;g"`
+
+listLinks(){
+  find $1 -type l -print0 | xargs -0 ls -ld | sed "s;.* $1;$1;" | sed "s; \+;_;g"
+}
+
+createListOfLinksTargetsDirectories(){
+  pushd $source >/dev/null 2>&1 
+    local links=`listLinks $source`
+    for x in $links ; do 
+      local ffileCandidate=$(echo $x | sed "s/.*_->_//") ;
+# ignoring relative paths as they may lead who know where later   
+# there can be simlink relative to position, so push is not catching all
+      [ "$ffileCandidate" != "${ffileCandidate#/}" ] && dirname $ffileCandidate
+    done | sort | uniq
+  popd >/dev/null 2>&1 
+}
+
+sourceLinks=`listLinks $source`
+targetLinks=`listLinks $target`
+sourceLinksDirsTarget=`createListOfLinksTargetsDirectories  $source`
+targetLinksDirsTarget=`createListOfLinksTargetsDirectories  $target`
 
 debug "source: $source"
 debug "target: $target"
@@ -69,6 +88,14 @@ $sourceLinks"
 debug "targetLinks:
 $targetLinks"
 
+debug "sourceLinksDirsTarget:
+$sourceLinksDirsTarget"
+debug "targetLinksDirsTarget:
+$targetLinksDirsTarget"
+
+sourceSearchPath="$source $sourceLinksDirsTarget"
+targetSearchPath="$target $targetLinksDirsTarget"
+
 work(){
   if [ "X$1" == "Xrpmnew" -o "X$1" == "Xrpmorig" ] ; then
     debug "Working with $1 (1)"
@@ -77,7 +104,7 @@ work(){
     return 1
   fi
 
-  local files=`find $target | grep "\\.$1$"`
+  local files=`find $targetSearchPath | grep "\\.$1$"`
   for file in $files ; do
     local sf1=`echo $file | sed "s/\\.$1$//"`
     local sf2=`echo $sf1 | sed "s/$targetName/$srcName/"`
@@ -118,7 +145,7 @@ work rpmorig
 debug "Working with rpmorig (2)"
 # simply moving old rpmsaves to new dir
 # fix for config (replace) leftovers
-files=`find $source | grep "\\.rpmorig$"`
+files=`find $sourceSearchPath | grep "\\.rpmorig$"`
   for file in $files ; do
     rpmsaveTarget=`echo $file | sed "s/$srcName/$targetName/"`
     debug "relocating $file to $rpmsaveTarget"
@@ -130,7 +157,7 @@ files=`find $source | grep "\\.rpmorig$"`
   done
 
 debug "Working with rpmsave (1)"
-files=`find $source | grep "\\.rpmsave$"`
+files=`find $sourceSearchPath | grep "\\.rpmsave$"`
   for file in $files ; do
     rpmsaveTarget=`echo $file | sed "s/$srcName/$targetName/"`
     debug "relocating $file to $rpmsaveTarget"
@@ -157,11 +184,11 @@ done
 
 debug "cleaning legacy leftowers"
 if [ "x$debug" == "xtrue" ] ; then
-  find $source -empty -type d -delete
-  rmdir $rma $source
+  find $sourceSearchPath -empty -type d -delete
+  rmdir $rma $sourceSearchPath
 else
-  find $source -empty -type d -delete 2>/dev/null >/dev/null
-  rmdir $rma $source 2>/dev/null >/dev/null
+  find $sourceSearchPath -empty -type d -delete 2>/dev/null >/dev/null
+  rmdir $rma $sourceSearchPath 2>/dev/null >/dev/null
 fi
 
 # and remove placeholders
