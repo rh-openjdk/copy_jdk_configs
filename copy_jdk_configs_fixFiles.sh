@@ -58,8 +58,16 @@ if [ ! -d  "$source" ] ; then
   exit 33
 fi 
 
+sourceLinks=`find $source -type l -print0 | xargs -0 ls -ld | sed "s;.* $source;$source;" | sed "s; \+;_;g"`
+targetLinks=`find $target -type l -print0 | xargs -0 ls -ld | sed "s;.* $target;$target;" | sed "s; \+;_;g"`
+
 debug "source: $source"
 debug "target: $target"
+
+debug "sourceLinks:
+$sourceLinks"
+debug "targetLinks:
+$targetLinks"
 
 work(){
   if [ "X$1" == "Xrpmnew" -o "X$1" == "Xrpmorig" ] ; then
