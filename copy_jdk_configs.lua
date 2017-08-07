@@ -159,12 +159,23 @@ if (debug) then
   print(debug);
 end
 
+local function debugOneLinePrint(string)
+  if (debug) then
+    print(string)
+  end;
+end
+
 
 --trasnform substitute names to lua patterns
 local name = string.gsub(string.gsub(origname, "%-", "%%-"), "%.", "%%.")
 local javaver = string.gsub(origjavaver, "%.", "%%.")
 
 local jvms = { }
+
+function getPath(str,sep)
+    sep=sep or '/'
+    return str:match("(.*"..sep..")")
+end
 
 function splitToTable(source, pattern)
   local i1 = string.gmatch(source, pattern) 
@@ -186,33 +197,44 @@ function trim(s)
   return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
+local function dirWithParents(path)
+  local s = ""
+  local dirs = splitToTable(path, "[^/]+") 
+  for i,d in pairs(dirs) do
+    if (i == #dirs) then
+      break
+    end
+    s = s.."/"..d
+    local stat2 = posix.stat(s, "type");
+    if (stat2 == nil) then
+      debugOneLinePrint(s.." does not exists, creating")
+      if (not dry) then
+        posix.mkdir(s)
+      end
+    else
+      debugOneLinePrint(s.." exists,not creating")
+    end
+  end
+end
 
-if (debug) then
-  print("started")
-end;
+
+debugOneLinePrint("started")
+
 
 foundJvms = posix.dir(jvmdir);
 if (foundJvms == nil) then
-  if (debug) then
-    print("no, or nothing in "..jvmdir.." exit")
-  end;
+  debugOneLinePrint("no, or nothing in "..jvmdir.." exit")
   return
 end
 
-if (debug) then
-  print("found "..#foundJvms.."jvms")
-end;
+debugOneLinePrint("found "..#foundJvms.."jvms")
 
 for i,p in pairs(foundJvms) do
 -- regex similar to %{_jvmdir}/%{name}-%{javaver}*%{_arch} bash command
   if (string.find(p, name.."%-"..javaver..".*"..arch) ~= nil ) then
-    if (debug) then
-      print("matched:  "..p)
-    end;
+    debugOneLinePrint("matched:  "..p)
     if (currentjvm ==  p) then
-      if (debug) then
-        print("this jdk is already installed. exiting lua script")
-      end;
+      debugOneLinePrint("this jdk is already installed. exiting lua script")
       return
     end ;
     if (string.match(p, ".*-debug$")) then
@@ -221,22 +243,16 @@ for i,p in pairs(foundJvms) do
       table.insert(jvms, p)
     end
   else
-    if (debug) then
-      print("NOT matched:  "..p)
-    end;
+    debugOneLinePrint("NOT matched:  "..p)
   end
 end
 
 if (#jvms <=0) then 
-  if (debug) then
-    print("no matching jdk in "..jvmdir.." exit")
-  end;
+  debugOneLinePrint("no matching jdk in "..jvmdir.." exit")
   return
 end;
 
-if (debug) then
-  print("matched "..#jvms.." jdk in "..jvmdir)
-end;
+debugOneLinePrint("matched "..#jvms.." jdk in "..jvmdir)
 
 --full names are like java-1.7.0-openjdk-1.7.0.60-2.4.5.1.fc20.x86_64
 table.sort(jvms , function(a,b) 
@@ -272,9 +288,7 @@ latestjvm = jvms[#jvms]
 
 if ( temp ~= nil ) then
   src=jvmdir.."/"..latestjvm
-  if (debug) then
-    print("temp declared as "..temp.." saving used dir of "..src)
-  end
+  debugOneLinePrint("temp declared as "..temp.." saving used dir of "..src)
   file = io.open (temp, "w")
   file:write(src)
   file:close()
@@ -286,59 +300,44 @@ local readlinkOutput=os.tmpname()
 for i,file in pairs(caredFiles) do
   local SOURCE=jvmdir.."/"..latestjvm.."/"..file
   local DEST=jvmDestdir.."/"..currentjvm.."/"..file
-  if (debug) then
-    print("going to copy "..SOURCE)
-    print("to  "..DEST)
-  end;
+  debugOneLinePrint("going to copy "..SOURCE)
+  debugOneLinePrint("to  "..DEST)
   local stat1 = posix.stat(SOURCE, "type");
   if (stat1 ~= nil) then
-  if (debug) then
-    print(SOURCE.." exists")
-  end;
-  local s = ""
-  local dirs = splitToTable(DEST, "[^/]+") 
-  for i,d in pairs(dirs) do
-    if (i == #dirs) then
-      break
-    end
-    s = s.."/"..d
-    local stat2 = posix.stat(s, "type");
-    if (stat2 == nil) then
-      if (debug) then
-        print(s.." does not exists, creating")
-      end;
-      if (not dry) then
-        posix.mkdir(s)
-      end
-    else
-      if (debug) then
-        print(s.." exists,not creating")
-      end;
-    end
-  end
+  debugOneLinePrint(SOURCE.." exists")
+  dirWithParents(DEST)
 -- Copy with -a to keep everything intact
     local exe = "cp".." -ar "..SOURCE.." "..DEST
     local linkExe = "readlink".." -f "..SOURCE.." > "..readlinkOutput
-    if (debug) then
-      print("executing "..linkExe)
-    end;
+    debugOneLinePrint("executing "..linkExe)
+    os.remove(readlinkOutput)
     os.execute(linkExe)
     local link=trim(slurp(readlinkOutput))
-    if (debug) then
-      print("  ...link is "..link)
-    end
+    debugOneLinePrint("  ...link is "..link)
     if (not ((link) == (SOURCE))) then
-      print("WARNING link "..link.." where file "..SOURCE.."expected!")
-    end
-    if (debug) then
-      print("executing "..exe)
-    end;    
-    if (not dry) then
-      os.execute(exe)
+      debugOneLinePrint("WARNING link "..link.." where file "..SOURCE.." expected!")
+      debugOneLinePrint("Will try to copy link target rather then link itself!")
+--replacing  any NVRA by future NVRA (still execting to have NVRA for any multiple-installable targets
+-- lua stubbornly consider dash as inteval. Replacing by dot to match X-Y more correct as X.Y rather then not at all
+      local linkDest=string.gsub(link, latestjvm:gsub("-", "."), currentjvm)
+      debugOneLinePrint("attempting to copy "..link.." to "..linkDest)
+      if (link == linkDest) then
+        debugOneLinePrint("Those are identical files! Nothing to do!")
+      else
+        local exe2 = "cp".." -ar "..link.." "..linkDest
+        dirWithParents(linkDest)
+        debugOneLinePrint("executing "..exe2)
+        if (not dry) then
+          os.execute(exe2)
+        end
+      end
+    else
+      debugOneLinePrint("executing "..exe)
+      if (not dry) then
+        os.execute(exe)
+      end
     end
   else
-    if (debug) then
-      print(SOURCE.." does not exists")
-    end;
+    debugOneLinePrint(SOURCE.." does not exists")
   end
 end
