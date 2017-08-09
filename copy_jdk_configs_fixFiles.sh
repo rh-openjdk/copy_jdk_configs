@@ -65,12 +65,19 @@ listLinks(){
 
 createListOfLinksTargetsDirectories(){
   pushd $source >/dev/null 2>&1 
-    local links=`listLinks $source`
+    local links=`listLinks $1`
     for x in $links ; do 
       local ffileCandidate=$(echo $x | sed "s/.*_->_//") ;
 # ignoring relative paths as they may lead who know where later   
 # there can be simlink relative to position, so push is not catching all
-      [ "$ffileCandidate" != "${ffileCandidate#/}" ] && dirname $ffileCandidate
+      if [ "$ffileCandidate" != "${ffileCandidate#/}" ] ; then
+        if [ -d $ffileCandidate ] ; then
+# should we accept the links to directories themselves?
+          echo $ffileCandidate
+        else
+          dirname $ffileCandidate
+        fi
+      fi
     done | sort | uniq
   popd >/dev/null 2>&1 
 }
