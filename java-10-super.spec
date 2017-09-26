@@ -173,29 +173,29 @@ mv  image/jre/lib/some.lib.so  $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib
 mv  image/jre/lib/security/local_policy.jar $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security
 
 
-mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/conf/security/policy/unlimited/
-mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/conf/management/
-mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/jre/lib/
-mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/
+mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/conf/security/policy/unlimited/
+mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/conf/management/
+mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/jre/lib/
+mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/
 #links are not marked, only targets are (should be default case?)
-mv "image/conf/security/policy/unlimited/default_US_export.policy" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/security/policy/unlimited/default_US_export.policy"
-mv "image/conf/security/java.policy" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/security/java.policy"
-mv "image/conf/security/java.security" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/security/java.security"
-mv "image/conf/logging.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/logging.properties"
+mv "image/conf/security/policy/unlimited/default_US_export.policy" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/security/policy/unlimited/default_US_export.policy"
+mv "image/conf/security/java.policy" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/security/java.policy"
+mv "image/conf/security/java.security" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/security/java.security"
+mv "image/conf/logging.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/logging.properties"
 #both links and targets are marked
-mv "image/conf/security/nss.cfg" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/security/nss.cfg"
-mv "image/conf/management/jmxremote.access" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/management/jmxremote.access"
-mv "image/conf/net.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/net.properties"
-mv "image/conf/sound.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/sound.properties"
+mv "image/conf/security/nss.cfg" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/security/nss.cfg"
+mv "image/conf/management/jmxremote.access" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/management/jmxremote.access"
+mv "image/conf/net.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/net.properties"
+mv "image/conf/sound.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/sound.properties"
 #only  links are marked,  targets are not (does it have sense?)
-mv "image/conf/management/jmxremote.password.template" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/management/jmxremote.password.template"
-mv "image/conf/management/management.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/management/management.properties"
-mv "image/conf/net2.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/net2.properties"
-mv "image/conf/sound2.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/"conf/sound2.properties"
+mv "image/conf/management/jmxremote.password.template" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/management/jmxremote.password.template"
+mv "image/conf/management/management.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/management/management.properties"
+mv "image/conf/net2.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/net2.properties"
+mv "image/conf/sound2.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/sound2.properties"
 
 
 confEtcDir=%{etcjavadir}
-confJvmDir=%{_jvmdir}/%{jredir}/conf/
+confJvmDir=%{_jvmdir}/%{sdkdir}/conf/
 mkdir -p $RPM_BUILD_ROOT/$confEtcDir
 
 # only target is marked
@@ -323,31 +323,31 @@ require "copy_jdk_configs.lua"
 %{_jvmdir}/%{jredir}/bin
 # files are in etc, links are in jvmdir
 #links are not marked, only targets are (should be default case?)
-%{_jvmdir}/%{jredir}/conf/security/policy/unlimited/default_US_export.policy
+%{_jvmdir}/%{sdkdir}/conf/security/policy/unlimited/default_US_export.policy
 %config(noreplace) %{etcjavadir}/default_US_export.policy
-%{_jvmdir}/%{jredir}/conf/security/java.policy
+%{_jvmdir}/%{sdkdir}/conf/security/java.policy
 %config(noreplace) %{etcjavadir}/java.policy
-%{_jvmdir}/%{jredir}/conf/security/java.security
+%{_jvmdir}/%{sdkdir}/conf/security/java.security
 %config %{etcjavadir}/java.security
-%{_jvmdir}/%{jredir}/conf/logging.properties
+%{_jvmdir}/%{sdkdir}/conf/logging.properties
 %config %{etcjavadir}/logging.properties
 #both links and targets are marked
-%config(noreplace) %{_jvmdir}/%{jredir}/conf/security/nss.cfg
+%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/security/nss.cfg
 %config(noreplace) %{etcjavadir}/nss.cfg
-%config(noreplace) %{_jvmdir}/%{jredir}/conf/management/jmxremote.access
+%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/management/jmxremote.access
 %config(noreplace) %{etcjavadir}/jmxremote.access
-%config %{_jvmdir}/%{jredir}/conf/net.properties
+%config %{_jvmdir}/%{sdkdir}/conf/net.properties
 %config %{etcjavadir}/net.properties
-%config %{_jvmdir}/%{jredir}/conf/sound.properties
+%config %{_jvmdir}/%{sdkdir}/conf/sound.properties
 %config %{etcjavadir}/sound.properties
 #only  links are marked,  targets are not (does it have sense?)
-%config(noreplace) %{_jvmdir}/%{jredir}/conf/management/jmxremote.password.template
+%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/management/jmxremote.password.template
 %{etcjavadir}/jmxremote.password.template
-%config(noreplace) %{_jvmdir}/%{jredir}/conf/management/management.properties
+%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/management/management.properties
 %{etcjavadir}/management.properties
-%config %{_jvmdir}/%{jredir}/conf/net2.properties
+%config %{_jvmdir}/%{sdkdir}/conf/net2.properties
 %{etcjavadir}/net2.properties
-%config %{_jvmdir}/%{jredir}/conf/sound2.properties
+%config %{_jvmdir}/%{sdkdir}/conf/sound2.properties
 %{etcjavadir}/sound2.properties
 # directories links. have marking some sense?
 # only target is marked
