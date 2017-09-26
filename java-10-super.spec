@@ -359,8 +359,14 @@ require "copy_jdk_configs.lua"
 #both are marked
 %{_jvmdir}/%{jredir}/lib/extrem
 %{etcjavadir}/jrelibextrem
-
-
+%dir %{etcjavasubdir}
+%dir %{etcjavadir}
+%dir %{_jvmdir}/%{sdkdir}/lib/
+%dir %{_jvmdir}/%{sdkdir}/conf/
+%dir %{_jvmdir}/%{sdkdir}/conf/management
+%dir %{_jvmdir}/%{sdkdir}/conf/security
+%dir %{_jvmdir}/%{sdkdir}/conf/security/policy
+%dir %{_jvmdir}/%{sdkdir}/conf/security/policy/unlimited
 
 %files devel
 %defattr(-,root,root)
