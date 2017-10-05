@@ -38,20 +38,7 @@ local caredFiles = {"jre/lib/calendars.properties",
               "lib/security/cacerts",
               "lib/security/blacklisted.certs",
               "lib/security/default.policy",
-              "conf/security/policy/limited/exempt_local.policy",
-              "conf/security/policy/limited/default_local.policy",
-              "conf/security/policy/limited/default_US_export.policy",
-              "conf/security/policy/unlimited/default_local.policy",
-              "conf/security/policy/unlimited/default_US_export.policy",
-              "conf/security/java.policy",
-              "conf/security/java.security",
-              "conf/logging.properties",
-              "conf/security/nss.cfg",
-              "conf/management/jmxremote.access",
-              "conf/management/jmxremote.password.template",
-              "conf/management/management.properties",
-              "conf/net.properties",
-              "conf/sound.properties",
+              "conf
               "lib/ext"}
 
 -- before import to allow run from spec
