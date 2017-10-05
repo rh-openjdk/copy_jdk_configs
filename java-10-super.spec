@@ -302,6 +302,13 @@ require "copy_jdk_configs.lua"
 # files are in etc, links are in jvmdir
 %dir %{etcjavasubdir}
 %dir %{etcjavadir}
+%dir %{etcjavadir}/lib
+%dir %{etcjavadir}/lib/security
+%dir %{etcjavadir}/conf
+%dir %{etcjavadir}/conf/management
+%dir %{etcjavadir}/conf/security
+%dir %{etcjavadir}/conf/security/policy
+%dir %{etcjavadir}/conf/security/policy/unlimited
 %config(noreplace) %{etcjavadir}/conf/logging.properties
 %config(noreplace) %{etcjavadir}/conf/management/jmxremote.access
 %config(noreplace) %{etcjavadir}/conf/management/jmxremote.password.template
