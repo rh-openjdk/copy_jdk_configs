@@ -7,7 +7,7 @@
 
 
 %define javaver     10
-%define etcjavasubdir     /etc/java/java-%{javaver}
+%define etcjavasubdir     /etc/java/java-%{javaver}-openjdk
 %define etcjavadir        %{etcjavasubdir}/%{uniquesuffix}
 %define javaver_alternatives	1.10.0
 %define	origin	super
