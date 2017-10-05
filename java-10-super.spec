@@ -103,37 +103,24 @@ echo "config(noreplace)2 %{uniquesuffix}" > jre/lib/security/java.policy
 echo "config(noreplace)3 %{uniquesuffix}" > jre/lib/security/java.security
 echo "config4 %{uniquesuffix}" > jre/lib/security/blacklist
 
-#marked == labeled in files as config/config(norepalce) 
+#marked == labeled in files as config/config(noreplace) 
 mkdir -p conf/security/policy/unlimited/
 mkdir -p conf/management/
 #links are not marked, only targets are (should be default case?)
 echo "config(noreplace), link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "conf/security/policy/unlimited/default_US_export.policy"
-echo "config(norepalce), link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/security/java.policy"
+echo "config(noreplace), link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/security/java.policy"
 echo "config, link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "conf/security/java.security"
 echo "config, link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/logging.properties"
 #both links and targets are marked
 echo "config(noreplace), link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "conf/security/nss.cfg"
-echo "config(norepalce), link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/management/jmxremote.access"
+echo "config(noreplace), link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/management/jmxremote.access"
 echo "config, link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "conf/net.properties"
 echo "config, link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/sound.properties"
 #only  links are marked,  targets are not (does it have sense?)
 echo "config(noreplace), link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "conf/management/jmxremote.password.template"
-echo "config(norepalce), link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/management/management.properties"
+echo "config(noreplace), link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/management/management.properties"
 echo "config, link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "conf/net2.properties"
 echo "config, link to %{etcjavasubdir}/nvra/filrname, constant" > "conf/sound2.properties"
-# directories links - have marking some sense?
-# only target is marked
-mkdir -p "lib/ext"
-echo "in cared dir, link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "lib/ext/blah11"
-echo "in cared dir, link to %{etcjavasubdir}/nvra/filrname, constant" > "lib/ext/blah12"
-#only link is marked
-mkdir -p "jre/lib/ext"
-echo "in cared dir, link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "jre/lib/ext/blah21"
-echo "in cared dir, link to %{etcjavasubdir}/nvra/filrname, constant" > "jre/lib/ext/blah22"
-# both marked
-mkdir -p "jre/lib/extrem"
-echo "in cared dir, link to %{etcjavasubdir}/nvra/filrname %{uniquesuffix}" > "jre/lib/extrem/blah31"
-echo "in cared dir, link to %{etcjavasubdir}/nvra/filrname, constant" > "jre/lib/extrem/blah32"
 
 
 echo "%{uniquesuffix}" > jre/bin/java
@@ -157,14 +144,20 @@ popd
 
 mkdir $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib
 mkdir $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security
+mkdir $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/
+mkdir $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/security
 mkdir $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/bin
 mkdir $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/bin
-mkdir $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib
 
-mv image/jre/lib/security/cacerts $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
-mv image/jre/lib/security/java.policy $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
-mv image/jre/lib/security/java.security $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
-mv image/jre/lib/security/blacklist $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
+cp image/jre/lib/security/cacerts $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
+cp image/jre/lib/security/java.policy $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
+cp image/jre/lib/security/java.security $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
+cp image/jre/lib/security/blacklist $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib/security/
+
+mv image/jre/lib/security/cacerts $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/security/
+mv image/jre/lib/security/java.policy $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/security/
+mv image/jre/lib/security/java.security $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/security/
+mv image/jre/lib/security/blacklist $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/security/
 
 mv  image/jre/bin/java $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/bin/java
 mv  image/bin/java $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/bin/java
@@ -176,7 +169,7 @@ mv  image/jre/lib/security/local_policy.jar $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}
 mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/conf/security/policy/unlimited/
 mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/conf/management/
 mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/jre/lib/
-mkdir -p $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/
+
 #links are not marked, only targets are (should be default case?)
 mv "image/conf/security/policy/unlimited/default_US_export.policy" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/security/policy/unlimited/default_US_export.policy"
 mv "image/conf/security/java.policy" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/security/java.policy"
@@ -195,39 +188,23 @@ mv "image/conf/sound2.properties" $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/"conf/sou
 
 
 confEtcDir=%{etcjavadir}
-confJvmDir=%{_jvmdir}/%{sdkdir}/conf/
+confJvmDir=%{_jvmdir}/%{sdkdir}
+
 mkdir -p $RPM_BUILD_ROOT/$confEtcDir
-
-# only target is marked
-mv  "image/lib/ext"     $RPM_BUILD_ROOT/%{etcjavadir}/libext
-#only link is marked
-mv  "image/jre/lib/ext" $RPM_BUILD_ROOT/%{etcjavadir}/jrelibext
-#both are marked
-mv  "image/jre/lib/extrem" $RPM_BUILD_ROOT/%{etcjavadir}/jrelibextrem
+mkdir -p $RPM_BUILD_ROOT/$confEtcDir/lib
 
 
-pushd $RPM_BUILD_ROOT/$confJvmDir
-  confs=`find . -type f`
-  for conf in $confs ; do
-    mv $conf $RPM_BUILD_ROOT/$confEtcDir/
-    file=$confEtcDir/`basename $conf`
-    linkName=$confJvmDir/$conf
-    ln -s $file  $conf
-  done
-popd
+mv "$RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/security/" $RPM_BUILD_ROOT/%{etcjavadir}/lib/
+mv "$RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/conf" $RPM_BUILD_ROOT/%{etcjavadir}/
+
   # directories links
-  # only target is marked
+pushd $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}
+  ln -s $confEtcDir/conf  ./conf
+popd
 pushd $RPM_BUILD_ROOT/%{_jvmdir}/%{sdkdir}/lib/
-  ln -s $confEtcDir/libext  ./ext
+  ln -s $confEtcDir/lib/security  ./security
 popd
-pushd $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib
-  #only link is marked
-  ln -s $confEtcDir/jrelibext ./ext
-popd
-pushd $RPM_BUILD_ROOT/%{_jvmdir}/%{jredir}/lib
-  #only link is marked
-  ln -s $confEtcDir/jrelibextrem ./extrem
-popd
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -309,6 +286,7 @@ require "copy_jdk_configs.lua"
 %files
 %defattr(-,root,root)
 %dir %{_jvmdir}/%{sdkdir}
+%dir %{_jvmdir}/%{sdkdir}/lib
 %dir %{_jvmdir}/%{jredir}
 %dir %{_jvmdir}/%{jredir}/lib/security/
 %dir %{_jvmdir}/%{jredir}/lib/
@@ -322,57 +300,31 @@ require "copy_jdk_configs.lua"
 %{_jvmdir}/%{jredir}/lib/some.lib.so
 %{_jvmdir}/%{jredir}/bin
 # files are in etc, links are in jvmdir
-#links are not marked, only targets are (should be default case?)
-%{_jvmdir}/%{sdkdir}/conf/security/policy/unlimited/default_US_export.policy
-%config(noreplace) %{etcjavadir}/default_US_export.policy
-%{_jvmdir}/%{sdkdir}/conf/security/java.policy
-%config(noreplace) %{etcjavadir}/java.policy
-%{_jvmdir}/%{sdkdir}/conf/security/java.security
-%config %{etcjavadir}/java.security
-%{_jvmdir}/%{sdkdir}/conf/logging.properties
-%config %{etcjavadir}/logging.properties
-#both links and targets are marked
-%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/security/nss.cfg
-%config(noreplace) %{etcjavadir}/nss.cfg
-%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/management/jmxremote.access
-%config(noreplace) %{etcjavadir}/jmxremote.access
-%config %{_jvmdir}/%{sdkdir}/conf/net.properties
-%config %{etcjavadir}/net.properties
-%config %{_jvmdir}/%{sdkdir}/conf/sound.properties
-%config %{etcjavadir}/sound.properties
-#only  links are marked,  targets are not (does it have sense?)
-%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/management/jmxremote.password.template
-%{etcjavadir}/jmxremote.password.template
-%config(noreplace) %{_jvmdir}/%{sdkdir}/conf/management/management.properties
-%{etcjavadir}/management.properties
-%config %{_jvmdir}/%{sdkdir}/conf/net2.properties
-%{etcjavadir}/net2.properties
-%config %{_jvmdir}/%{sdkdir}/conf/sound2.properties
-%{etcjavadir}/sound2.properties
-# directories links. have marking some sense?
-# only target is marked
-%{_jvmdir}/%{sdkdir}/lib/ext
-%{etcjavadir}/libext
-#only link is marked
-%{_jvmdir}/%{jredir}/lib/ext
-%{etcjavadir}/jrelibext
-#both are marked
-%{_jvmdir}/%{jredir}/lib/extrem
-%{etcjavadir}/jrelibextrem
 %dir %{etcjavasubdir}
 %dir %{etcjavadir}
-%dir %{_jvmdir}/%{sdkdir}/lib/
-%dir %{_jvmdir}/%{sdkdir}/conf/
-%dir %{_jvmdir}/%{sdkdir}/conf/management
-%dir %{_jvmdir}/%{sdkdir}/conf/security
-%dir %{_jvmdir}/%{sdkdir}/conf/security/policy
-%dir %{_jvmdir}/%{sdkdir}/conf/security/policy/unlimited
+%config(noreplace) %{etcjavadir}/conf/logging.properties
+%config(noreplace) %{etcjavadir}/conf/management/jmxremote.access
+%config(noreplace) %{etcjavadir}/conf/management/jmxremote.password.template
+%config(noreplace) %{etcjavadir}/conf/management/management.properties
+%config(noreplace) %{etcjavadir}/conf/net.properties
+%config(noreplace) %{etcjavadir}/conf/net2.properties
+%config(noreplace) %{etcjavadir}/conf/security/java.policy
+%config(noreplace) %{etcjavadir}/conf/security/java.security
+%config(noreplace) %{etcjavadir}/conf/security/nss.cfg
+%config(noreplace) %{etcjavadir}/conf/security/policy/unlimited/default_US_export.policy
+%config(noreplace) %{etcjavadir}/conf/sound.properties
+%config(noreplace) %{etcjavadir}/conf/sound2.properties
+%config(noreplace) %{etcjavadir}/lib/security/blacklist
+%config(noreplace) %{etcjavadir}/lib/security/cacerts
+%config(noreplace) %{etcjavadir}/lib/security/java.policy
+%config(noreplace) %{etcjavadir}/lib/security/java.security
+%{_jvmdir}/%{sdkdir}/conf
+%{_jvmdir}/%{sdkdir}/lib/security
+
 
 %files devel
 %defattr(-,root,root)
 %{_jvmdir}/%{sdkdir}/bin/*
-
-
 
 
 %changelog
