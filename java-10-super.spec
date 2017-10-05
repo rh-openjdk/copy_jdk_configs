@@ -59,7 +59,7 @@ Requires(post):   /usr/sbin/update-alternatives
 Requires(postun): /usr/sbin/update-alternatives
 Requires(post):   perl
 Requires(postun): perl
-Requires:	copy-jdk-configs
+Requires:	copy-jdk-configs >= 3.2
 BuildRequires:    desktop-file-utils
 
 %description

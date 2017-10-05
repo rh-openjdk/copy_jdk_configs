@@ -22,7 +22,7 @@ local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/security/blacklisted.certs",
               "jre/lib/ext",
               "lib/security",
-              "conf
+              "conf",
               "lib/ext"}
 
 -- before import to allow run from spec
