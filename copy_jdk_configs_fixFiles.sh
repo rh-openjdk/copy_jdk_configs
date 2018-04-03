@@ -63,6 +63,15 @@ listLinks(){
   find $1 -type l -print0 | xargs -0 ls -ld | sed "s;.* $1;$1;" | sed "s; \+;_;g"
 }
 
+printIfExists(){
+  if [ -e $ffileCandidate ] ; then
+    echo $1
+  else
+    # stdout can be captured, therefore stderr
+    debug "skipping not-existing link-target-dir $1" 1>&2
+  fi
+}
+
 createListOfLinksTargetsDirectories(){
   pushd $source >/dev/null 2>&1 
     local links=`listLinks $1`
@@ -73,9 +82,9 @@ createListOfLinksTargetsDirectories(){
       if [ "$ffileCandidate" != "${ffileCandidate#/}" ] ; then
         if [ -d $ffileCandidate ] ; then
 # should we accept the links to directories themselves?
-          echo $ffileCandidate
+          printIfExists $ffileCandidate
         else
-          dirname $ffileCandidate
+          printIfExists `dirname $ffileCandidate`
         fi
       fi
     done | sort | uniq
