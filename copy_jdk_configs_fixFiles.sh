@@ -60,7 +60,7 @@ fi
 
 
 listLinks(){
-  find $1 -type l -print0 | xargs -0 ls -ld | sed "s;.* $1;$1;" | sed "s; \+;_;g"
+  find $1 -type l -print0 | xargs -0 ls -ld | sed "s; \+-> \+;_->_;g" | sed "s;.* $1;$1;"
 }
 
 printIfExists(){
@@ -76,15 +76,19 @@ createListOfLinksTargetsDirectories(){
   pushd $source >/dev/null 2>&1 
     local links=`listLinks $1`
     for x in $links ; do 
+      echo "$x" | grep "jre-abrt" > /dev/null
+      if [ $? -eq 0 ] ; then
+        continue
+      fi
       local ffileCandidate=$(echo $x | sed "s/.*_->_//") ;
 # ignoring relative paths as they may lead who know where later   
 # there can be simlink relative to position, so push is not catching all
       if [ "$ffileCandidate" != "${ffileCandidate#/}" ] ; then
         if [ -d $ffileCandidate ] ; then
 # should we accept the links to directories themselves?
-          printIfExists $ffileCandidate
+          echo $ffileCandidate
         else
-          printIfExists `dirname $ffileCandidate`
+          dirname $ffileCandidate
         fi
       fi
     done | sort | uniq
@@ -129,8 +133,7 @@ work(){
     if [ $? -gt 0 ] ; then
      if [ "X$1" == "Xrpmnew" ] ; then
        debug "$sf2 was NOT modified, removing possibly corrupted $sf1 and renaming from $file"
-       rm $rma $sf1 
-       mv $rma $file $sf1
+       mv $rma -f $file $sf1
        if [ $? -eq 0 ] ; then
          echo "restored $file to $sf1"
        else
