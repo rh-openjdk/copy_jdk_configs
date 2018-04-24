@@ -86,9 +86,9 @@ createListOfLinksTargetsDirectories(){
       if [ "$ffileCandidate" != "${ffileCandidate#/}" ] ; then
         if [ -d $ffileCandidate ] ; then
 # should we accept the links to directories themselves?
-          echo $ffileCandidate
+          printIfExists $ffileCandidate
         else
-          dirname $ffileCandidate
+          printIfExists `dirname $ffileCandidate`
         fi
       fi
     done | sort | uniq
