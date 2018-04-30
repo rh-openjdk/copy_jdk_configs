@@ -29,6 +29,8 @@ local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/security/cacerts",
               "jre/lib/security/blacklisted.certs",
               "jre/lib/ext",
+              "jre/lib/security/blacklist",
+              "jre/lib/security/javaws.policy",
               "lib/security",
               "conf",
               "lib/ext"}
