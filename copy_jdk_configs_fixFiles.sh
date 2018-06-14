@@ -192,8 +192,12 @@ files=`find $sourceSearchPath | grep "\\.rpmsave$"`
 #warning: file /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.131-11.b12.el7.x86_64-debug/jre/lib/amd64/client: remove failed: No such file or directory
 #warning: file /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.171-2.6.13.2.el7.x86_64/jre/lib/amd64/xawt: remove failed: No such file or directory
 #those dirs might be mepty by installtion, filling to not be rmeoved later
-blackdirs="$source/jre/lib/applet $source/jre/lib/*/client $source/jre/lib/locale/*/LC_MESSAGES $source/jre/lib/*/xawt $source/jre/javaws $source/properties/version $source/properties $source/jre/lib/endorsed $source/jre/lib/boot $source/lib/missioncontrol/p2/org.eclipse.equinox.p2.engine/profileRegistry/JMC.profile/.data"
-
+#use exported CJC_BLACKDIRS_ADD to extend it in runtime/spec file
+blackdirs=""
+internal_blackdirs="jre/lib/applet jre/lib/*/client jre/lib/locale/*/LC_MESSAGES jre/lib/*/xawt jre/javaws properties/version properties jre/lib/endorsed jre/lib/boot lib/missioncontrol/p2/org.eclipse.equinox.p2.engine/profileRegistry/JMC.profile/.data"
+for x in $internal_blackdirs $CJC_BLACKDIRS_ADD ; do 
+  blackdirs="$blackdirs $source/$x"
+done
 
 for blackdir in $blackdirs; do
   if [ -e $blackdir ] ; then
