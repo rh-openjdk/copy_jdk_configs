@@ -135,7 +135,7 @@ work(){
        debug "$sf2 was NOT modified, removing possibly corrupted $sf1 and renaming from $file"
        mv $rma -f $file $sf1
        if [ $? -eq 0 ] ; then
-         debug "restored $file to $sf1"
+         echo "restored $file to $sf1"
        else
          debug "FAILED to restore $file to $sf1"
        fi
