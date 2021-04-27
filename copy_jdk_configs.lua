@@ -4,6 +4,9 @@
 --test call
 --lua -- copy_jdk_configs.lua   --currentjvm "java-1.8.0-openjdk-1.8.0.65-3.b17.fc22.x86_64" --jvmdir "/usr/lib/jvm" --origname "java-1.8.0-openjdk" --origjavaver "1.8.0" --arch "x86_64" --debug true  --jvmDestdir /home/jvanek/Desktop
 
+local M = {}
+
+local debug = false;
 local function debugOneLinePrint(string)
   if (debug) then
     print(string)
@@ -62,7 +65,7 @@ end
 -- https://bugzilla.redhat.com/show_bug.cgi?id=1892224
 -- for readability not indented, todo, indent once tuned
 
-local function mainProgram(arg)
+function M.mainProgram(arg)
 local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/content-types.properties",
               "jre/lib/flavormap.properties",
@@ -117,7 +120,6 @@ local jvmDestdir = nil
 local origname = nil
 local origjavaver = nil
 local arch = nil
-local debug = false;
 local temp = nil;
 local dry = false;
 
@@ -339,5 +341,7 @@ end --unindented main function
 if (arg == nil) then
   debugOneLinePrint("arg variable is nil, you have to call mainProgram manually") -- this can actually not be invoked, as the debug is set via arg
 else
-  mainProgram(arg)
+  M.mainProgram(arg)
 end
+
+return M
