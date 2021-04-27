@@ -1,6 +1,6 @@
 #!/usr/bin/lua
 -- http://pkgs.fedoraproject.org/cgit/rpms/java-1.8.0-openjdk.git/tree/java-1.8.0-openjdk.spec#n1760
--- this file is about to be indlined in spec file, note that the copypaste in spec file may be more accurate then this one
+-- this file is about to be inlined in spec file, note that the copypaste in spec file may be more accurate then this one
 local posix = require "posix"
 
 local debug = true

@@ -4,6 +4,65 @@
 --test call
 --lua -- copy_jdk_configs.lua   --currentjvm "java-1.8.0-openjdk-1.8.0.65-3.b17.fc22.x86_64" --jvmdir "/usr/lib/jvm" --origname "java-1.8.0-openjdk" --origjavaver "1.8.0" --arch "x86_64" --debug true  --jvmDestdir /home/jvanek/Desktop
 
+local function debugOneLinePrint(string)
+  if (debug) then
+    print(string)
+  end;
+end
+
+function getPath(str,sep)
+    sep=sep or '/'
+    return str:match("(.*"..sep..")")
+end
+
+function splitToTable(source, pattern)
+  local i1 = string.gmatch(source, pattern)
+  local l1 = {}
+  for i in i1 do
+    table.insert(l1, i)
+  end
+  return l1
+end
+
+local function slurp(path)
+    local f = io.open(path)
+    local s = f:read("*a")
+    f:close()
+    return s
+end
+
+function trim(s)
+  return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+local function dirWithParents(path)
+  local s = ""
+  local dirs = splitToTable(path, "[^/]+")
+  for i,d in pairs(dirs) do
+    if (i == #dirs) then
+      break
+    end
+    s = s.."/"..d
+    local stat2 = posix.stat(s, "type");
+    if (stat2 == nil) then
+      debugOneLinePrint(s.." does not exists, creating")
+      if (not dry) then
+        posix.mkdir(s)
+      end
+    else
+      debugOneLinePrint(s.." exists,not creating")
+    end
+  end
+end
+
+
+-- main function,
+-- formelry main body
+-- move to function resolved
+-- https://bugzilla.redhat.com/show_bug.cgi?id=1892224
+-- for readability not indented, todo, indent once tuned
+
+local function mainProgram(arg)
 local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/content-types.properties",
               "jre/lib/flavormap.properties",
@@ -145,64 +204,11 @@ if (debug) then
   print(debug);
 end
 
-local function debugOneLinePrint(string)
-  if (debug) then
-    print(string)
-  end;
-end
-
-
 --trasnform substitute names to lua patterns
 local name = string.gsub(string.gsub(origname, "%-", "%%-"), "%.", "%%.")
 local javaver = string.gsub(origjavaver, "%.", "%%.")
 
 local jvms = { }
-
-function getPath(str,sep)
-    sep=sep or '/'
-    return str:match("(.*"..sep..")")
-end
-
-function splitToTable(source, pattern)
-  local i1 = string.gmatch(source, pattern) 
-  local l1 = {}
-  for i in i1 do
-    table.insert(l1, i)
-  end
-  return l1
-end
-
-local function slurp(path)
-    local f = io.open(path)
-    local s = f:read("*a")
-    f:close()
-    return s
-end
-
-function trim(s)
-  return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
-local function dirWithParents(path)
-  local s = ""
-  local dirs = splitToTable(path, "[^/]+") 
-  for i,d in pairs(dirs) do
-    if (i == #dirs) then
-      break
-    end
-    s = s.."/"..d
-    local stat2 = posix.stat(s, "type");
-    if (stat2 == nil) then
-      debugOneLinePrint(s.." does not exists, creating")
-      if (not dry) then
-        posix.mkdir(s)
-      end
-    else
-      debugOneLinePrint(s.." exists,not creating")
-    end
-  end
-end
-
 
 debugOneLinePrint("started")
 
@@ -326,4 +332,12 @@ for i,file in pairs(caredFiles) do
   else
     debugOneLinePrint(SOURCE.." does not exists")
   end
+end
+
+end --unindented main function
+
+if (arg == nil) then
+  debugOneLinePrint("arg variable is nil, you have to call mainProgram manually") -- this can actually not be invoked, as the debug is set via arg
+else
+  mainProgram(arg)
 end
