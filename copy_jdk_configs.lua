@@ -35,6 +35,7 @@ local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/ext",
               "jre/lib/security/blacklist",
               "jre/lib/security/javaws.policy",
+              "jre/lib/security/nss.fips.cfg",
               "lib/security",
               "conf",
               "lib/ext"}
