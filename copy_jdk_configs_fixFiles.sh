@@ -4,21 +4,36 @@ target=$2
 
 debug="false"
 
-rma=""
-  if [ "x$debug" == "xtrue" ] ; then
-    rma="-v"
-  fi
-
 debug(){
   if [ "x$debug" == "xtrue" ] ; then
-    echo "$1"
+    echo "$@"
   fi
+}
+
+cmdvDebug() {
+  if [ "x$debug" == "xtrue" ] ; then
+    "$@" -v
+  else
+    "$@" 1>/dev/null 2>&1
+  fi
+}
+
+mvDebug() {
+  cmdvDebug mv "$@"
+}
+
+rmDebug() {
+  cmdvDebug rm "$@"
+}
+
+rmdirDebug() {
+ cmdvDebug rmdir "$@"
 }
 
 #we should be pretty strict about removing once used (even "used" [with fail]) config file, as it may corrupt another installation
 clean(){
   debug "cleanup: removing $config"
-  rm -rf $config
+  rmDebug -rf $config
 }
 
 if [ "x" == "x$config" ] ; then
@@ -133,7 +148,7 @@ work(){
     if [ $? -gt 0 ] ; then
      if [ "X$1" == "Xrpmnew" ] ; then
        debug "$sf2 was NOT modified, removing possibly corrupted $sf1 and renaming from $file"
-       mv $rma -f $file $sf1
+       mvDebug -f $file $sf1
        if [ $? -eq 0 ] ; then
          echo "restored $file to $sf1"
        else
@@ -142,14 +157,14 @@ work(){
     fi
      if [ "X$1" == "Xrpmorig" ] ; then
        debug "$sf2 was NOT modified, removing possibly corrupted $file"
-       rm $rma $file
+       rmDebug $file
     fi
     else
      debug "$sf2 was modified, keeping $file, and removing the duplicated original"
      # information is now backuped, in new directory anyway. Removing future rpmsave to allow rpm -e
-     rm -f $rma $sf2
+     rmDebug -f $sf2
      # or its corresponding backup
-     rm -f $rma $sf2.$1
+     rmDebug -f $sf2.$1
     fi
 done
 }
@@ -169,9 +184,9 @@ files=`find $sourceSearchPath | grep "\\.rpmorig$"`
     rpmsaveTarget=`echo $file | sed "s/$srcName/$targetName/"`
     debug "relocating $file to $rpmsaveTarget"
     if [ -e $rpmsaveTarget ] ; then
-      rm $rma $file
+      rmDebug $file
     else
-      mv $rma $file $rpmsaveTarget
+      mvDebug $file $rpmsaveTarget
     fi
   done
 
@@ -181,9 +196,9 @@ files=`find $sourceSearchPath | grep "\\.rpmsave$"`
     rpmsaveTarget=`echo $file | sed "s/$srcName/$targetName/"`
     debug "relocating $file to $rpmsaveTarget"
     if [ -e $rpmsaveTarget ] ; then
-      rm $rma $file
+      rmDebug $file
     else
-      mv $rma $file $rpmsaveTarget
+      mvDebug $file $rpmsaveTarget
     fi
   done
 
@@ -211,20 +226,21 @@ done
 debug "cleaning legacy leftowers"
 if [ "x$debug" == "xtrue" ] ; then
   find $sourceSearchPath -empty -type d -delete
-  rmdir $rma $sourceSearchPath
 else
   find $sourceSearchPath -empty -type d -delete 2>/dev/null >/dev/null
-  rmdir $rma $sourceSearchPath 2>/dev/null >/dev/null
 fi
+rmdirDebug $sourceSearchPath
 
 # and remove placeholders
 for blackdir in $blackdirs; do
   if [ -e $blackdir ] ; then
     debug "nasty $blackdir  exists, cleaning placeholder"
-    rm $blackdir/C-J-C_placeholder
+    rmDebug $blackdir/C-J-C_placeholder
   else
     debug "nasty $blackdir  DONT exists, ignoring again"
   fi
 done
 
 clean
+
+exit 0
