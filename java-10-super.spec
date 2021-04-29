@@ -31,8 +31,6 @@
 %define sdkbindir       %{_jvmdir}/%{sdkdir}/bin
 %define jrebindir       %{_jvmdir}/%{jredir}/bin
 
-%define jvmjardir       %{_jvmjardir}/%{uniquesuffix}
-
 %define rpm_state_dir %{_localstatedir}/lib/rpm-state
 
 
@@ -136,7 +134,6 @@ rm -rf $RPM_BUILD_ROOT
 # main files
 install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
 install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
-install -d -m 755 $RPM_BUILD_ROOT%{jvmjardir}
 
 pushd $RPM_BUILD_ROOT%{_jvmdir}
 ln -s %{jredir} %{jrelnk_name}
@@ -222,12 +219,17 @@ fi
 -- see https://bugzilla.redhat.com/show_bug.cgi?id=1038092 for whole issue
 -- see https://bugzilla.redhat.com/show_bug.cgi?id=1290388 for pretrans over pre
 -- if copy-jdk-configs is in transaction, it installs in pretrans to temp
--- if copy_jdk_configs is in temp, then it means that copy-jdk-configs is in tranasction  and so is
--- preferred over one in %%{_libexecdir}. If it is not in transaction, then depends 
+-- if copy_jdk_configs is in temp, then it means that copy-jdk-configs is in transaction  and so is
+-- preferred over one in %%{_libexecdir}. If it is not in transaction, then depends
 -- whether copy-jdk-configs is installed or not. If so, then configs are copied
 -- (copy_jdk_configs from %%{_libexecdir} used) or not copied at all
 local posix = require "posix"
-local debug = false
+
+if (os.getenv("debug") == "true") then
+  debug = true;
+else 
+  debug = false;
+end
 
 SOURCE1 = "%{rpm_state_dir}/copy_jdk_configs.lua"
 SOURCE2 = "%{_libexecdir}/copy_jdk_configs.lua"
@@ -240,10 +242,10 @@ local stat2 = posix.stat(SOURCE2, "type");
     print(SOURCE1 .." exists - copy-jdk-configs in transaction, using this one.")
   end;
   package.path = package.path .. ";" .. SOURCE1
-else 
+else
   if (stat2 ~= nil) then
   if (debug) then
-    print(SOURCE2 .." exists - copy-jdk-configs alrady installed and NOT in transation. Using.")
+    print(SOURCE2 .." exists - copy-jdk-configs already installed and NOT in transaction. Using.")
   end;
   package.path = package.path .. ";" .. SOURCE2
   else
@@ -255,18 +257,17 @@ else
   return
   end
 end
--- run contetn of included file with fake args
-arg = {"--currentjvm", "%{uniquesuffix}", "--jvmdir", "%{_jvmdir}", "--origname", "%{name}", "--origjavaver", "%{javaver}", "--arch", "%{_arch}", "--temp", "%{rpm_state_dir}/%{name}.%{_arch}"}
-require "copy_jdk_configs.lua"
+-- run content of included file with fake args
+cjc = require "copy_jdk_configs.lua"
+arg = {"--currentjvm", "%{uniquesuffix %{nil}}", "--jvmdir", "%{_jvmdir %{nil}}", "--origname", "%{name}", "--origjavaver", "%{javaver}", "--arch", "%{_arch}", "--temp", "%{rpm_state_dir}/%{name}.%{_arch}"}
+cjc.mainProgram(arg)
 
 
 %post devel
 #update-alternatives --install %{_bindir}/javac javac %{sdk_versionless_bindir}/javac %{priority} \
 #--slave %{_jvmdir}/java                     java_sdk                    %{_jvmdir}/%{sdkdir} 
 #update-alternatives --install %{_jvmdir}/java-%{origin} java_sdk_%{origin} %{_jvmdir}/%{sdklnk_versionless_name} %{priority} \
-#--slave %{_jvmjardir}/java-%{origin}        java_sdk_%{origin}_exports  %{_jvmjardir}/%{sdkdir}
 #update-alternatives --install %{_jvmdir}/java-%{javaver_alternatives} java_sdk_%{javaver_alternatives} %{_jvmdir}/%{sdklnk_versionless_name} %{priority} \
-#--slave %{_jvmjardir}/java-%{javaver_alternatives}       java_sdk_%{javaver_alternatives}_exports %{_jvmjardir}/%{sdkdir}
 
 %postun
 #update-alternatives --remove java %{jre_versionless_bindir}/java
@@ -291,7 +292,6 @@ require "copy_jdk_configs.lua"
 %dir %{_jvmdir}/%{jredir}/lib/security/
 %dir %{_jvmdir}/%{jredir}/lib/
 %{_jvmdir}/%{jrelnk_name}
-%{jvmjardir}
 %config %{_jvmdir}/%{jredir}/lib/security/cacerts
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
