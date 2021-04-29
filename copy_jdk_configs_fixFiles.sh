@@ -2,13 +2,13 @@
 config=$1
 target=$2
 
-debug="false"
-
 debug(){
   if [ "x$debug" == "xtrue" ] ; then
     echo "$@"
   fi
 }
+
+debug "debug is on"
 
 cmdvDebug() {
   if [ "x$debug" == "xtrue" ] ; then

@@ -1,12 +1,17 @@
 #!/usr/bin/lua
 -- rpm call
--- lua -- copy_jdk_configs.lua   --currentjvm "%{uniquesuffix %{nil}}" --jvmdir "%{_jvmdir %{nil}}" --origname "%{name}" --origjavaver "%{javaver}" --arch "%{_arch}" --debug true
+-- debug=true lua -- copy_jdk_configs.lua   --currentjvm "%{uniquesuffix %{nil}}" --jvmdir "%{_jvmdir %{nil}}" --origname "%{name}" --origjavaver "%{javaver}" --arch "%{_arch}"
 --test call
---lua -- copy_jdk_configs.lua   --currentjvm "java-1.8.0-openjdk-1.8.0.65-3.b17.fc22.x86_64" --jvmdir "/usr/lib/jvm" --origname "java-1.8.0-openjdk" --origjavaver "1.8.0" --arch "x86_64" --debug true  --jvmDestdir /home/jvanek/Desktop
+-- debug=true lua -- copy_jdk_configs.lua   --currentjvm "java-1.8.0-openjdk-1.8.0.65-3.b17.fc22.x86_64" --jvmdir "/usr/lib/jvm" --origname "java-1.8.0-openjdk" --origjavaver "1.8.0" --arch "x86_64" --jvmDestdir /home/jvanek/Desktop
 
 local M = {}
 
-local debug = false;
+if (os.getenv("debug") == "true") then
+  debug = true;
+else 
+  debug = false;
+end
+
 local function debugOneLinePrint(string)
   if (debug) then
     print(string)
@@ -66,6 +71,7 @@ end
 -- for readability not indented, todo, indent once tuned
 
 function M.mainProgram(arg)
+debugOneLinePrint("lua debug on")
 local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/content-types.properties",
               "jre/lib/flavormap.properties",
