@@ -9,6 +9,7 @@ local posix = require "posix"
 
 if (os.getenv("debug") == "true") then
   debug = true;
+  print("cjc: in spec debug is on")
 else 
   debug = false;
 end

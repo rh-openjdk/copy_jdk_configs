@@ -71,7 +71,7 @@ end
 -- for readability not indented, todo, indent once tuned
 
 function M.mainProgram(arg)
-debugOneLinePrint("lua debug on")
+debugOneLinePrint("cjc: lua debug on")
 local caredFiles = {"jre/lib/calendars.properties",
               "jre/lib/content-types.properties",
               "jre/lib/flavormap.properties",
@@ -227,7 +227,7 @@ if (foundJvms == nil) then
   return
 end
 
-debugOneLinePrint("found "..#foundJvms.."jvms")
+debugOneLinePrint("found "..#foundJvms.." jvms")
 
 for i,p in pairs(foundJvms) do
 -- regex similar to %{_jvmdir}/%{name}-%{javaver}*%{_arch} bash command

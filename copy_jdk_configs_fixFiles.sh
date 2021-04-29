@@ -8,7 +8,7 @@ debug(){
   fi
 }
 
-debug "debug is on"
+debug "cjc: bash debug is on"
 
 cmdvDebug() {
   if [ "x$debug" == "xtrue" ] ; then

@@ -45,20 +45,14 @@ Group:		Development/Interpreters
 Provides:       jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
 Provides:       jre-%{origin} = %{epoch}:%{version}-%{release}
 Provides:       jre-%{javaver}, java-%{javaver}, jre = %{epoch}:%{javaver} 
-Provides:	java-%{origin} = %{epoch}:%{version}-%{release}
+Provides:       java-%{origin} = %{epoch}:%{version}-%{release}
 Provides:       java = %{epoch}:%{javaver}
-Requires:	/usr/sbin/update-alternatives
-Requires:	jpackage-utils >= 0:1.5.38
+Requires:       /usr/sbin/update-alternatives
 
 BuildRequires:	dos2unix, jpackage-utils >= 0:1.5.38, sed, %{_bindir}/perl
-Requires(post):   desktop-file-utils
-Requires(postun): desktop-file-utils
 Requires(post):   /usr/sbin/update-alternatives
 Requires(postun): /usr/sbin/update-alternatives
-Requires(post):   perl
-Requires(postun): perl
 Requires:	copy-jdk-configs >= 3.2
-BuildRequires:    desktop-file-utils
 
 %description
 This package contains the Super Java Runtime Environment.
@@ -227,6 +221,7 @@ local posix = require "posix"
 
 if (os.getenv("debug") == "true") then
   debug = true;
+  print("cjc: in spec debug is on")
 else 
   debug = false;
 end
