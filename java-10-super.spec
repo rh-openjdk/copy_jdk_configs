@@ -52,7 +52,7 @@ Requires:       /usr/sbin/update-alternatives
 BuildRequires:	dos2unix, jpackage-utils >= 0:1.5.38, sed, %{_bindir}/perl
 Requires(post):   /usr/sbin/update-alternatives
 Requires(postun): /usr/sbin/update-alternatives
-Requires:	copy-jdk-configs >= 3.2
+Requires:	copy-jdk-configs >= 4.0
 
 %description
 This package contains the Super Java Runtime Environment.
@@ -252,10 +252,10 @@ else
   return
   end
 end
--- run content of included file with fake args
+arg = nil ;  -- it is better to null the arg up, no meter if they exists or not, and use cjc as module in unified way, instead of relaying on "main" method during require "copy_jdk_configs.lua"
 cjc = require "copy_jdk_configs.lua"
-arg = {"--currentjvm", "%{uniquesuffix %{nil}}", "--jvmdir", "%{_jvmdir %{nil}}", "--origname", "%{name}", "--origjavaver", "%{javaver}", "--arch", "%{_arch}", "--temp", "%{rpm_state_dir}/%{name}.%{_arch}"}
-cjc.mainProgram(arg)
+args = {"--currentjvm", "%{uniquesuffix %{nil}}", "--jvmdir", "%{_jvmdir %{nil}}", "--origname", "%{name}", "--origjavaver", "%{javaver}", "--arch", "%{_arch}", "--temp", "%{rpm_state_dir}/%{name}.%{_arch}"}
+cjc.mainProgram(args)
 
 
 %post devel
