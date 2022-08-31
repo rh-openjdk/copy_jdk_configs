@@ -10,6 +10,18 @@ debug(){
 
 debug "cjc: bash debug is on"
 
+isJavaConfig() {
+  local arg="${1}"
+  if [[  `realpath -s $arg` = /usr/lib/jvm/java* || `realpath -s $arg` = /etc/java/java* ]] ; then
+    if [[  `readlink -f $arg` = /usr/lib/jvm/java* || `readlink -f $arg` = /etc/java/java* ]] ; then
+        debug "$arg / `realpath -s $arg` / `readlink -f $arg` is correct jdk folder"
+      return 0
+    fi
+  fi
+  debug "$arg / `realpath -s $arg` / `readlink -f $arg` is not jdk folder, file/dir should be skipped"
+  return 1
+}
+
 cmdvDebug() {
   if [ "x$debug" == "xtrue" ] ; then
     "$@" -v
@@ -23,11 +35,19 @@ mvDebug() {
 }
 
 rmDebug() {
-  cmdvDebug rm "$@"
+  for x in "$@" ; do 
+    if isJavaConfig "$x" ; then
+      cmdvDebug rm "$@"
+    fi
+  done
 }
 
 rmdirDebug() {
- cmdvDebug rmdir "$@"
+  for x in "$@" ; do 
+    if isJavaConfig "$x" ; then
+      cmdvDebug rmdir "$@"
+    fi
+  done
 }
 
 #we should be pretty strict about removing once used (even "used" [with fail]) config file, as it may corrupt another installation
@@ -225,9 +245,12 @@ done
 
 debug "cleaning legacy leftowers"
 if [ "x$debug" == "xtrue" ] ; then
-  find $sourceSearchPath -empty -type d -delete
+  emptyCandidates=`find $sourceSearchPath -empty -type d`
 else
-  find $sourceSearchPath -empty -type d -delete 2>/dev/null >/dev/null
+  emptyCandidates=`find $sourceSearchPath -empty -type d 2>/dev/null`
+fi
+if [ ! "x$emptyCandidates" == "x" ] ; then
+  rmdirDebug $emptyCandidates
 fi
 rmdirDebug $sourceSearchPath
 
