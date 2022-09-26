@@ -12,13 +12,15 @@ debug "cjc: bash debug is on"
 
 isJavaConfig() {
   local arg="${1}"
-  if [[  `realpath -s $arg` = /usr/lib/jvm/java* || `realpath -s $arg` = /etc/java/java* ]] ; then
-    if [[  `readlink -f $arg` = /usr/lib/jvm/java* || `readlink -f $arg` = /etc/java/java* ]] ; then
-        debug "$arg / `realpath -s $arg` / `readlink -f $arg` is correct jdk folder"
+  local relpath=`realpath -s $arg`
+  local realink=`readlink -f $arg`
+  if [[  ${relpath} = /usr/lib/jvm/java* || ${relpath} = /etc/java/java* ]] ; then
+    if [[  ${realink} = /usr/lib/jvm/java* || ${realink} = /etc/java/java* ]] ; then
+        debug "$arg / ${relpath} / ${realink} is correct jdk folder"
       return 0
     fi
   fi
-  debug "$arg / `realpath -s $arg` / `readlink -f $arg` is not jdk folder, file/dir should be skipped"
+  debug "$arg / ${relpath} / ${realink} is not jdk folder, file/dir should be skipped"
   return 1
 }
 
