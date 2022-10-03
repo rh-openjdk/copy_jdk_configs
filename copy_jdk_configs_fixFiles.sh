@@ -37,17 +37,23 @@ mvDebug() {
 }
 
 rmDebug() {
+  local switch=""
   for x in "$@" ; do 
-    if isJavaConfig "$x" ; then
-      cmdvDebug rm "$@"
+    if [[ $x == -* ]] ; then
+      switch="$switch $x"
+    elif isJavaConfig "$x" ; then
+      cmdvDebug rm $switch "$x"
     fi
   done
 }
 
 rmdirDebug() {
+  local switch=""
   for x in "$@" ; do 
-    if isJavaConfig "$x" ; then
-      cmdvDebug rmdir "$@"
+    if [[ $x == -* ]] ; then
+      switch="$switch $x"
+    elif isJavaConfig "$x" ; then
+      cmdvDebug rmdir $switch "$x"
     fi
   done
 }
@@ -55,7 +61,11 @@ rmdirDebug() {
 #we should be pretty strict about removing once used (even "used" [with fail]) config file, as it may corrupt another installation
 clean(){
   debug "cleanup: removing $config"
-  rmDebug -rf $config
+  if [ "x$debug" == "xtrue" ] ; then
+   rm -rf $config -v
+  else
+   rm -rf $config 1>/dev/null 2>&1
+  fi
 }
 
 if [ "x" == "x$config" ] ; then
